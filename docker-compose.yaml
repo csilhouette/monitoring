@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  prometheus-server:
+    image: prom/prometheus
+    volumes:
+      - "./config/prometheus-server-config.yaml:/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - prometheus-gateway
+
+  prometheus-gateway:
+    image: prom/pushgateway
+    ports:
+      - "9091:9091"
+
+  s3proxy:
+    image: minio/minio
+    environment:
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=password
+    ports:
+      - "9000:9000"
+    command: [ "minio", "server", "--address", ":9000", "/data" ]
